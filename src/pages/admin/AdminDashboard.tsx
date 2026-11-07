@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
-import { StatCard, Card, CardHeader } from '@/components/ui';
+import { StatCard } from '@/components/ui/StatCard';
+import { Card, CardHeader } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { formatKsh, formatTime } from '@/lib/format';
@@ -49,7 +50,10 @@ export function AdminDashboard() {
 
   const paidSales = todaySales.filter((s) => s.payment_status === 'paid');
   const todayRevenue = paidSales.reduce((sum, s) => sum + s.total, 0);
-  const grossProfit = paidSales.reduce((sum, s) => sum + (s.subtotal - s.sale_items?.reduce((c, i) => c + i.cost_price * i.quantity, 0) ?? 0), 0);
+  const grossProfit = paidSales.reduce((sum, s) => {
+    const cost = s.sale_items?.reduce((c, i) => c + i.cost_price * i.quantity, 0) ?? 0;
+    return sum + (s.subtotal - cost);
+  }, 0);
 
   return (
     <div className="space-y-5 animate-fade-in">
