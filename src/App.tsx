@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { supabaseEnvError } from '@/lib/supabase';
 import { LoginPage } from '@/pages/LoginPage';
 import { Layout } from '@/components/Layout';
 import { CashierDashboard } from '@/pages/cashier/CashierDashboard';
@@ -175,11 +177,26 @@ function Shell() {
   );
 }
 
-function App() {
+function EnvError() {
   return (
-    <AuthProvider>
-      <Shell />
-    </AuthProvider>
+    <div className="flex min-h-screen items-center justify-center bg-ink-950 p-4">
+      <div className="max-w-md rounded-2xl bg-white p-6 text-center shadow-xl">
+        <h2 className="font-display text-lg font-bold text-ink-900">Configuration Error</h2>
+        <p className="mt-2 text-sm text-ink-500">{supabaseEnvError}</p>
+        <button onClick={() => window.location.reload()} className="btn-primary mt-4">Reload</button>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  if (supabaseEnvError) return <EnvError />;
+  return (
+    <ErrorBoundary>
+      <AuthProvider>
+        <Shell />
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 
